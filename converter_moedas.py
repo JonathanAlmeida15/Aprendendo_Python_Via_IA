@@ -28,6 +28,7 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> Dec
         raise RuntimeError(f"Erro ao acessar a API: {e}")
 
     data = response.json()
+    print("DEBUG resposta API:", data)  # log para debugar
     if not data.get("success"):
         raise ValueError("Erro na conversão: resposta inválida da API.")
 
