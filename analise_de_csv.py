@@ -18,4 +18,4 @@ print("Nulos por coluna:")
 print(titanic.isnull().sum())
 
 # Preenchendo idade faltante com a média
-titanic['Age'] = titanic['Age'].fillna(titanic['Age'].mean())
+titanic['age'] = titanic['age'].fillna(titanic['age'].mean())
