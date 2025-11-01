@@ -1,0 +1,3 @@
+model,rmse,mse,r2,cv_mean_r2,cv_std_r2,model_path,feature_importances_csv
+linear_regression,0.6738172671433788,0.4540297095005714,0.6535206053685136,0.6593421780379061,0.01950380973363103,outputs\models\linear_regression.joblib,
+random_forest,0.5050374306048586,0.2550628063119574,0.8053563348945036,0.8033674652763763,0.005712125016700532,outputs\models\random_forest.joblib,outputs\feature_importances_random_forest.csv
