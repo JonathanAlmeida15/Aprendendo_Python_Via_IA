@@ -1,58 +1,56 @@
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+# detector_spam_nb.py
 
-# 1. Carregar dataset
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# === 1. Carregar dataset ===
+# Dataset de exemplo (você pode substituir por outro CSV se quiser)
+# Este é o dataset público de SMS Spam
 url = "https://raw.githubusercontent.com/justmarkham/pycon-2016-tutorial/master/data/sms.tsv"
 df = pd.read_csv(url, sep='\t', header=None, names=['label', 'message'])
 
-# 2. Converter rótulos (spam / ham → 1 / 0)
-encoder = LabelEncoder()
-df['label'] = encoder.fit_transform(df['label'])
+print("Amostra de dados:")
+print(df.head())
 
-# 3. Dividir em treino e teste
-X_train, X_test, y_train, y_test = train_test_split(df['message'], df['label'], test_size=0.2, random_state=42)
+# === 2. Converter rótulos ===
+df['label_num'] = df.label.map({'ham': 0, 'spam': 1})
 
-# 4. Tokenização (conversão de palavras em números)
-tokenizer = Tokenizer(num_words=5000, oov_token="<OOV>")
-tokenizer.fit_on_texts(X_train)
-X_train_seq = tokenizer.texts_to_sequences(X_train)
-X_test_seq = tokenizer.texts_to_sequences(X_test)
+# === 3. Dividir dados em treino e teste ===
+X_train, X_test, y_train, y_test = train_test_split(
+    df['message'], df['label_num'], test_size=0.2, random_state=42
+)
 
-# 5. Padronizar o tamanho das sequências
-maxlen = 100
-X_train_pad = pad_sequences(X_train_seq, maxlen=maxlen, padding='post')
-X_test_pad = pad_sequences(X_test_seq, maxlen=maxlen, padding='post')
+# === 4. Vetorização de texto ===
+vectorizer = CountVectorizer(stop_words='english')
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
 
-# 6. Criar modelo de rede neural LSTM
-model = Sequential([
-    Embedding(input_dim=5000, output_dim=64, input_length=maxlen),
-    LSTM(64, dropout=0.2, recurrent_dropout=0.2),
-    Dense(32, activation='relu'),
-    Dropout(0.5),
-    Dense(1, activation='sigmoid')
-])
+# === 5. Treinar modelo ===
+model = MultinomialNB()
+model.fit(X_train_vec, y_train)
 
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+# === 6. Fazer previsões ===
+y_pred = model.predict(X_test_vec)
 
-# 7. Treinar modelo
-history = model.fit(X_train_pad, y_train, epochs=5, batch_size=64, validation_data=(X_test_pad, y_test))
+# === 7. Avaliação ===
+print("\nAcurácia:", accuracy_score(y_test, y_pred))
+print("\nMatriz de confusão:\n", confusion_matrix(y_test, y_pred))
+print("\nRelatório de classificação:\n", classification_report(y_test, y_pred))
 
-# 8. Avaliar
-loss, acc = model.evaluate(X_test_pad, y_test)
-print(f"\n✅ Acurácia final: {acc:.2f}")
+# === 8. Testar com mensagens novas ===
+testes = [
+    "Congratulations! You've won a $1000 Walmart gift card. Go to http://bit.ly/123456 to claim now.",
+    "Oi, tudo bem? Te vejo no almoço amanhã?",
+    "Get cheap loans with no credit check! Apply now!",
+    "Reunião confirmada às 15h com o cliente."
+]
 
-# 9. Testar com texto manual
-while True:
-    msg = input("\nDigite uma mensagem para testar (ou 'sair'): ")
-    if msg.lower() == "sair":
-        break
-    seq = tokenizer.texts_to_sequences([msg])
-    pad = pad_sequences(seq, maxlen=maxlen, padding='post')
-    pred = model.predict(pad)[0][0]
-    print("📩 SPAM" if pred > 0.5 else "💬 Não é SPAM")
+testes_vec = vectorizer.transform(testes)
+previsoes = model.predict(testes_vec)
+
+print("\n=== Testes manuais ===")
+for msg, pred in zip(testes, previsoes):
+    print(f"\nMensagem: {msg}\n→ Classificação: {'SPAM' if pred == 1 else 'NÃO SPAM'}")
