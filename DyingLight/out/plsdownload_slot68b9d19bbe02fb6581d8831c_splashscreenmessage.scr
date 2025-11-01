@@ -1,0 +1,72 @@
+export int FTextAlign_left      = 272;
+export int FTextAlign_center    = 288;
+export int FTextAlign_right     = 320;
+
+export int FUIAnchor_left       = 1;
+export int FUIAnchor_right      = 4;       
+export int FUIAnchor_center     = 16;
+
+sub main()
+{
+	News() 
+    {
+        //Enable();
+        //Enable(PC, XBOX, PS4, GOG, EPIC, SWITCH);
+        Enable(true, true, true, false, true, false);
+        ShowScrollView(true);
+		ScrollViewSize(645, 600);
+		ScrollViewPosition(220, 40);
+        MessageListPosition(220, -295);
+        BackButtonText("&ScreenBuyNow_BtnBackToMenu&");
+	
+		ActionBtnText("&WhatsNew_Demo_DL2_Action_Button&");
+
+		OpenURL("https://go.dyinglight.com/Out_In_The_Wild");
+		
+        Data()
+        {
+            Header("&event_header&")
+            {
+                font("boxed_m_12");
+                textColor([1.0, 1.0, 1.0]);
+				enableColorControlSequence();
+            }
+	
+            Image("splash_the_beast_v2_new"); 
+			
+			Space(10);
+			
+			Paragraph("&event_paragraph_1&")
+            {
+                enableColorControlSequence();
+                textAlign(FTextAlign_left);
+                font("boxed_l_9");
+                textColor([1.0, 1.0, 1.0]);
+            }
+			
+			Paragraph("&event_paragraph_2&")
+            {
+                enableColorControlSequence();
+                textAlign(FTextAlign_left);
+                font("boxed_l_9");
+                textColor([1.0, 1.0, 1.0]);
+            }
+			
+			Paragraph("&event_paragraph_3&")
+            {
+                enableColorControlSequence();
+                textAlign(FTextAlign_left);
+                font("boxed_l_9");
+                textColor([1.0, 1.0, 1.0]);
+            }
+			
+			Paragraph("&event_paragraph_4&")
+            {
+                enableColorControlSequence();
+                textAlign(FTextAlign_left);
+                font("boxed_l_9");
+                textColor([1.0, 1.0, 1.0]);
+            }
+        } //Data
+    } //News
+}
